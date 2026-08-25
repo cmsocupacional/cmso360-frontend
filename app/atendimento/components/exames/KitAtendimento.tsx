@@ -60,7 +60,10 @@ const KitAtendimento: React.FC<KitAtendimentoProps> = ({
           exameItem.grupo?.toLowerCase() === grupoExame.toLowerCase(),
       ).map((exameItem: any) => ({
         ...exameItem,
-        realizado: false, // Inicializa como não realizado para evitar finalização em massa
+        realizado:
+          exameItem.status === "PENDENTE"
+            ? undefined
+            : exameItem.status !== "NAO_REALIZADO",
       }));
 
       setExamesFiltrados(examesFiltrados);
@@ -121,6 +124,8 @@ const KitAtendimento: React.FC<KitAtendimentoProps> = ({
     </div>
   );
 
+  const todosRespondidos = examesFiltrados.every((exame) => exame.realizado !== undefined);
+
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6 min-h-screen">
       {/* Alerta de Kit Atendimento */}
@@ -172,7 +177,7 @@ const KitAtendimento: React.FC<KitAtendimentoProps> = ({
                       color="success"
                       label="Exame realizado?"
                       orientation="horizontal"
-                      value={exameItem.realizado ? "sim" : "nao"}
+                      value={exameItem.realizado === undefined ? "" : exameItem.realizado ? "sim" : "nao"}
                       onValueChange={(value) =>
                         handleRealizacaoExameChange(
                           exameItem.codigoExame,
@@ -221,7 +226,7 @@ const KitAtendimento: React.FC<KitAtendimentoProps> = ({
         <Button
           className="px-8 bg-brand-primary text-white shadow-sm hover:bg-brand-primary-hover transition-colors"
           color="primary"
-          isDisabled={loading}
+          isDisabled={loading || !todosRespondidos}
           startContent={loading ? <Spinner size="sm" /> : <FileText className="h-4 w-4" />}
           onPress={handleSave}
         >
