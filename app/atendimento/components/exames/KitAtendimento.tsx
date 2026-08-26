@@ -102,6 +102,7 @@ const KitAtendimento: React.FC<KitAtendimentoProps> = ({
           codigoExame: exame.codigoExame,
           sequencialResultadoExame: exame.sequencialResultadoExame,
           realizado: exame.realizado,
+          motivoNaoRealizado: exame.realizado === false ? observacoes : undefined,
         })),
       });
     } finally {

@@ -95,6 +95,7 @@ const ExamePadrao: React.FC<ExamePadraoProps> = ({
           codigoExame: exame.codigoExame,
           sequencialResultadoExame: exame.sequencialResultadoExame,
           realizado: exame.realizado,
+          motivoNaoRealizado: exame.realizado === false ? observacoes : undefined,
         })),
       });
     } finally {
