@@ -62,6 +62,11 @@ export const campaignsClient = {
       method: 'POST'
     });
   },
+  async retriggerCampaign(id: string) {
+    return fetchWithAuth(`/customer-email-campaigns/${id}/retrigger`, {
+      method: 'POST'
+    });
+  },
 
   async deleteCampaign(id: string) {
     return fetchWithAuth(`/customer-email-campaigns/${id}`, {
