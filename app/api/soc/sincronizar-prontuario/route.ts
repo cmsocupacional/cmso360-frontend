@@ -7,20 +7,49 @@ import { NEST_URL } from "@/config/constants";
 export async function POST(req: Request) {
   try {
     const ck = await cookies();
-    const authToken = ck.get("auth_token")?.value;
+    let authToken = ck.get("auth_token")?.value;
+    const refreshToken = ck.get("refresh_token")?.value;
 
-    if (!authToken) {
-      return NextResponse.json(
-        { message: "Token de autenticacao ausente" },
-        { status: 401 },
-      );
+    let validToken: string | null = null;
+
+    if (authToken) {
+      const payload = await JWT.verifyJwt(authToken);
+      if (payload) {
+        validToken = authToken;
+      }
     }
 
-    const payload = await JWT.verifyJwt(authToken);
+    // Se auth_token não for válido, tenta renovar via refresh_token
+    if (!validToken && refreshToken) {
+      const refreshPayload = await JWT.verifyJwt(refreshToken);
+      if (refreshPayload) {
+        const { iat, exp, ...userInfo } = refreshPayload as any;
+        const newToken = await JWT.signJwt(userInfo, "1h");
+        const newRefreshToken = await JWT.signJwt(userInfo, "7d");
 
-    if (!payload) {
+        ck.set("auth_token", newToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+          path: "/",
+          maxAge: 60 * 60,
+        });
+
+        ck.set("refresh_token", newRefreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+          path: "/",
+          maxAge: 7 * 24 * 60 * 60,
+        });
+
+        validToken = newToken;
+      }
+    }
+
+    if (!validToken) {
       return NextResponse.json(
-        { message: "Token invalido ou expirado" },
+        { message: "Token de autenticacao ausente ou expirado" },
         { status: 401 },
       );
     }
@@ -31,7 +60,7 @@ export async function POST(req: Request) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
+        Authorization: `Bearer ${validToken}`,
       },
       body: JSON.stringify(body),
     });

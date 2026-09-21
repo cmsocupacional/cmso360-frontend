@@ -43,6 +43,7 @@ import { Scheduling } from "@/lib/scheduling/interface/scheduling";
 import { AtendimentoStatus } from "@/lib/scheduling/enum/scheduling.enum";
 import { IUserInfo } from "@/hooks/useUser";
 import { buildViewerUrl, buildDocFilename } from "@/lib/blob/blob-proxy";
+import { fetchWithAuth } from "@/lib/api/fetchWithAuth";
 
 interface LazyModalContentProps {
   atendimento: Scheduling;
@@ -274,7 +275,7 @@ const LazyModalContent: React.FC<LazyModalContentProps> = ({
     try {
       setLoadingSyncSoc(true);
 
-      const response = await fetch("/api/soc/sincronizar-prontuario", {
+      const response = await fetchWithAuth("/api/soc/sincronizar-prontuario", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

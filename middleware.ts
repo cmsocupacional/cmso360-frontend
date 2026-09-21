@@ -6,9 +6,32 @@ import { JWT } from "@/lib/jwt/jwt";
 
 const RENEW_THRESHOLD = 10 * 60; // renovar faltando 10 min
 
+function handleUnauthenticated(request: NextRequest) {
+  const isApiRoute = request.nextUrl.pathname.startsWith("/api");
+
+  if (isApiRoute) {
+    return NextResponse.json(
+      { message: "Token de autenticacao ausente ou expirado" },
+      { status: 401 },
+    );
+  }
+
+  const url = new URL("/", request.url);
+  url.searchParams.set("callbackUrl", request.nextUrl.pathname);
+
+  return NextResponse.redirect(url);
+}
+
 export async function middleware(request: NextRequest) {
-  // Página pública do totem — não requer autenticação
-  if (request.nextUrl.pathname.startsWith("/teleatendimento/totem")) {
+  const pathname = request.nextUrl.pathname;
+
+  // Páginas/rotas públicas — não requerem verificação no middleware
+  if (
+    pathname.startsWith("/teleatendimento/totem") ||
+    pathname === "/api/auth" ||
+    pathname.startsWith("/api/auth/logout") ||
+    pathname.startsWith("/api/auth/recovery")
+  ) {
     return NextResponse.next();
   }
 
@@ -16,16 +39,14 @@ export async function middleware(request: NextRequest) {
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
   if (!token && !refreshToken) {
-    return redirectToLogin(request);
+    return handleUnauthenticated(request);
   }
-
-  let response = NextResponse.next();
 
   try {
     let payload = null;
     let needsRefresh = false;
 
-    // 1. Tentar validar o auth_token via verifyJwt (assinatura real)
+    // 1. Tentar validar o auth_token via verifyJwt
     if (token) {
       payload = await JWT.verifyJwt(token);
 
@@ -49,7 +70,7 @@ export async function middleware(request: NextRequest) {
       const refreshPayload = await JWT.verifyJwt(refreshToken);
 
       if (!refreshPayload) {
-        return redirectToLogin(request); // refresh também inválido ou expirado
+        return handleUnauthenticated(request); // refresh também inválido ou expirado
       }
 
       // Restaura o payload a partir do refresh_token válido
@@ -61,6 +82,17 @@ export async function middleware(request: NextRequest) {
       // Gera novos tokens (Sliding Session)
       const newToken = await JWT.signJwt(userInfo, "1h");
       const newRefreshToken = await JWT.signJwt(userInfo, "7d");
+
+      // Atualiza cookie no cabeçalho do request para a API corrente enxergar o novo auth_token
+      const requestHeaders = new Headers(request.headers);
+      request.cookies.set("auth_token", newToken);
+      request.cookies.set("refresh_token", newRefreshToken);
+
+      const response = NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        },
+      });
 
       response.cookies.set("auth_token", newToken, {
         httpOnly: true,
@@ -77,28 +109,24 @@ export async function middleware(request: NextRequest) {
         path: "/",
         maxAge: 7 * 24 * 60 * 60, // 7 dias
       });
+
+      return response;
     } else if (!payload) {
       // Sem tokens válidos disponíveis
-      return redirectToLogin(request);
+      return handleUnauthenticated(request);
     }
 
-    return response;
+    return NextResponse.next();
   } catch (error) {
     console.error("Middleware Auth Error:", error);
 
-    return redirectToLogin(request);
+    return handleUnauthenticated(request);
   }
-}
-function redirectToLogin(request: NextRequest) {
-  const url = new URL("/", request.url);
-
-  url.searchParams.set("callbackUrl", request.nextUrl.pathname);
-
-  return NextResponse.redirect(url);
 }
 
 export const config = {
   matcher: [
+    "/api/:path*",
     "/atendimento/:path*",
     "/dashboard/:path*",
     "/prontuarios/:path*",
