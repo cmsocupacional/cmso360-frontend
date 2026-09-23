@@ -213,11 +213,11 @@ const AnexoCard = memo(
           isActive ? "bg-primary-50" : "hover:bg-default-50"
         }`}
       >
-        <td className="p-2 text-default-800 overflow-hidden">
-          <div className="flex items-start gap-2">
+        <td className="p-2 text-default-800 overflow-hidden break-words">
+          <div className="flex min-w-0 items-start gap-2">
             <FileText className="w-4 h-4 text-[#44735E] shrink-0 mt-0.5" />
             <div className="flex flex-col min-w-0 overflow-hidden">
-              <span className="font-medium truncate text-xs sm:text-sm">
+              <span className="font-medium min-w-0 truncate break-words text-xs sm:text-sm">
                 {anexo.Name}
               </span>
               <div className="flex items-center gap-1.5">
@@ -1363,11 +1363,6 @@ const PainelDireita: React.FC<RightPanelProps> = ({
       );
 
       if (pdfIndex !== -1) {
-        document.getElementById("pdf-viewer")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        });
         onPdfIndexChange(pdfIndex);
       }
     },
@@ -1383,11 +1378,6 @@ const PainelDireita: React.FC<RightPanelProps> = ({
       );
 
       if (pdfIndex !== -1) {
-        document.getElementById("pdf-viewer")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        });
         onPdfIndexChange(pdfIndex);
       }
     },
@@ -1753,7 +1743,7 @@ const PainelDireita: React.FC<RightPanelProps> = ({
                   }
                 >
                   <div className="overflow-x-auto p-1">
-                    <table className="w-full text-xs text-left border-collapse">
+                    <table className="w-full table-fixed text-xs text-left border-collapse">
                       <thead className="sticky top-0 bg-default-100 z-10">
                         <tr className="text-default-700">
                           <th className="p-2 font-semibold w-[50%]">Exame</th>
@@ -1792,7 +1782,7 @@ const PainelDireita: React.FC<RightPanelProps> = ({
                       <h5 className="text-xs font-semibold text-default-600 mb-2">
                         Anexos ({selectedRecord.ANEXOS.length})
                       </h5>
-                      <table className="w-full text-xs text-left border-collapse">
+                      <table className="w-full table-fixed text-xs text-left border-collapse">
                         <thead className="sticky top-0 bg-default-100 z-10">
                           <tr className="text-default-700">
                             <th className="p-2 font-semibold w-[50%]">Arquivo</th>
