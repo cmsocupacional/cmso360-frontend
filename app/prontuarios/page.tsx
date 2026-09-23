@@ -652,7 +652,7 @@ export default function UnifiedProntuarioPage() {
         onLogout={logout}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-w-0 overflow-hidden">
         {/* LEFT: Lista / filtros */}
         <aside className="w-80 bg-default-50 border-r border-divider p-4 flex flex-col flex-shrink-0">
           <div className="space-y-4">

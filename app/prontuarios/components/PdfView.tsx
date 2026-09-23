@@ -51,7 +51,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({
   };
 
   return (
-    <main className="flex-1 bg-default-900 relative flex flex-col">
+    <main className="flex-1 min-w-0 bg-default-900 relative flex flex-col">
       {selectedRecord ? (
         <>
           {/* Header do PDF Viewer */}

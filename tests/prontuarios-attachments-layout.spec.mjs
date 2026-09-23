@@ -9,6 +9,14 @@ const panelSource = fs.readFileSync(
   path.join(projectRoot, "app", "prontuarios", "components", "PainelDireita.tsx"),
   "utf8",
 );
+const pageSource = fs.readFileSync(
+  path.join(projectRoot, "app", "prontuarios", "page.tsx"),
+  "utf8",
+);
+const pdfViewerSource = fs.readFileSync(
+  path.join(projectRoot, "app", "prontuarios", "components", "PdfView.tsx"),
+  "utf8",
+);
 
 test("mantém a coluna Ver alinhada mesmo com nomes longos de anexos", () => {
   const attachmentsTable = panelSource.match(
@@ -22,4 +30,9 @@ test("mantém a coluna Ver alinhada mesmo com nomes longos de anexos", () => {
 
 test("selecionar exame ou anexo não desloca horizontalmente o painel direito", () => {
   assert.doesNotMatch(panelSource, /document\.getElementById\("pdf-viewer"\)\?\.scrollIntoView/);
+});
+
+test("mantém o visualizador limitado para o painel direito continuar visível", () => {
+  assert.match(pageSource, /<div className="flex flex-1 min-w-0 overflow-hidden">/);
+  assert.match(pdfViewerSource, /<main className="flex-1 min-w-0/);
 });
