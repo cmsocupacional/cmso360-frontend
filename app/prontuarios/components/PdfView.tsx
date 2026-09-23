@@ -17,7 +17,6 @@ const PdfViewer: React.FC<PdfViewerProps> = ({
   currentPdfIndex,
   onPdfIndexChange,
 }) => {
-  const [zoom, setZoom] = useState<number>(100);
   const [cacheBust, setCacheBust] = useState<number>(Date.now());
 
   const rawUrl = selectedRecord?.pdfUrls?.[currentPdfIndex]?.url ?? "";
@@ -95,7 +94,7 @@ const PdfViewer: React.FC<PdfViewerProps> = ({
 
            {/* Área do PDF */}
            <div
-             className="flex-1 flex items-center justify-center p-4 overflow-hidden"
+             className="flex-1 min-w-0 min-h-0 flex items-center justify-center p-4 overflow-hidden"
              id="pdf-viewer"
            >
              {!currentPdfUrl ? (
@@ -110,15 +109,15 @@ const PdfViewer: React.FC<PdfViewerProps> = ({
                </div>
              ) : (
                <iframe
-                 className="bg-white shadow-2xl rounded-lg transition-all duration-300"
+                 className="w-full h-full min-w-0 min-h-0 bg-white shadow-2xl rounded-lg transition-all duration-300"
                  src={iframeSrc}
                  style={{
-                   width: `${zoom}%`,
-                   height: `${zoom}%`,
+                   width: "100%",
+                   height: "100%",
                    maxWidth: "100%",
                    maxHeight: "100%",
-                   minWidth: "50%",
-                   minHeight: "50%",
+                   minWidth: 0,
+                   minHeight: 0,
                    border: 0,
                  }}
                  title={currentPdfTitle}

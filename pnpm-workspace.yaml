@@ -1,12 +1,6 @@
 allowBuilds:
-  '@heroui/shared-utils': false
-  '@tailwindcss/oxide': false
-  bcrypt: false
-  sharp: false
-  unrs-resolver: false
-onlyBuiltDependencies:
-  - '@heroui/shared-utils'
-  - '@tailwindcss/oxide'
-  - bcrypt
-  - sharp
-  - unrs-resolver
+  '@heroui/shared-utils': true
+  '@tailwindcss/oxide': true
+  bcrypt: true
+  sharp: true
+  unrs-resolver: true

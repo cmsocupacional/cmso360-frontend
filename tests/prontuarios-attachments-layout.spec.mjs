@@ -36,3 +36,11 @@ test("mantém o visualizador limitado para o painel direito continuar visível",
   assert.match(pageSource, /<div className="flex flex-1 min-w-0 overflow-hidden">/);
   assert.match(pdfViewerSource, /<main className="flex-1 min-w-0/);
 });
+
+test("faz o iframe do PDF respeitar exatamente o espaço do visualizador", () => {
+  assert.match(pdfViewerSource, /className="flex-1 min-w-0 min-h-0 flex items-center/);
+  assert.doesNotMatch(pdfViewerSource, /minWidth: "50%"/);
+  assert.doesNotMatch(pdfViewerSource, /minHeight: "50%"/);
+  assert.match(pdfViewerSource, /width: "100%"/);
+  assert.match(pdfViewerSource, /height: "100%"/);
+});
