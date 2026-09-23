@@ -661,7 +661,7 @@ const LazyModalContent: React.FC<LazyModalContentProps> = ({
                   })
                 }
               >
-                Sincronizar SOC
+                {loadingSyncSoc ? "Sincronizando..." : "Sincronizar SOC"}
               </Button>
               <Button
                 color="danger"
@@ -684,6 +684,20 @@ const LazyModalContent: React.FC<LazyModalContentProps> = ({
         </div>
       </ModalHeader>
       <ModalBody>
+        {loadingSyncSoc ? (
+          <div
+            aria-live="polite"
+            className="mb-4 flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800 shadow-sm"
+          >
+            <Spinner color="primary" size="sm" />
+            <div>
+              <p className="text-sm font-semibold">Sincronizando com o SOC</p>
+              <p className="text-xs text-blue-700">
+                Atualizando dados, exames e situação do atendimento. Aguarde a conclusão.
+              </p>
+            </div>
+          </div>
+        ) : null}
         <InformacoesGerais
           atendimento={atendimento}
           editMode={editMode}
