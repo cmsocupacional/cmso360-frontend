@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/teleatendimento/totem") ||
     pathname === "/api/auth" ||
     pathname.startsWith("/api/auth/logout") ||
-    pathname.startsWith("/api/auth/recovery")
+    pathname.startsWith("/api/auth/recovery") ||
+    pathname === "/api/register"
   ) {
     return NextResponse.next();
   }
