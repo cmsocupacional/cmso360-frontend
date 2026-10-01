@@ -28,6 +28,9 @@ export async function middleware(request: NextRequest) {
   // Páginas/rotas públicas — não requerem verificação no middleware
   if (
     pathname.startsWith("/teleatendimento/totem") ||
+    pathname.startsWith("/mural") ||
+    pathname.startsWith("/api/mural") ||
+    pathname.startsWith("/api/weather") ||
     pathname === "/api/auth" ||
     pathname.startsWith("/api/auth/logout") ||
     pathname.startsWith("/api/auth/recovery") ||
