@@ -118,6 +118,7 @@ const AtendimentoModalExames = ({
   const { saveDraft, loadDraft, clearDraft } = useExamDraft(
     funcionarioSelecionado?._id ?? null,
     draftCodigosExame,
+    { sala, profissional: effectiveUser ?? undefined },
   );
 
   // Formulário inicial: rascunho salvo tem prioridade sobre dado do banco

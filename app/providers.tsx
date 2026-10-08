@@ -13,6 +13,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { AppDataProvider } from "./context/AppDataContext";
 import { GedBatchSocketProvider } from "./context/GedBatchSocketProvider";
+import { ExamDraftAutoSync } from "@/components/ExamDraftAutoSync";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   return (
     <HeroUIProvider navigate={router.push}>
       <ToastProvider />
+      <ExamDraftAutoSync />
       <QueryClientProvider client={queryClient}>
         <NextThemesProvider {...themeProps}>
           <AppDataProvider initialData={null}>

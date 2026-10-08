@@ -4,16 +4,65 @@ import { useCallback, useEffect, useRef } from "react";
 const DRAFT_KEY_PREFIX = "exam_draft_";
 const DRAFT_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 horas
 
-type DraftPayload = {
+export type DraftPayload = {
   formulario: any;
   schedulingId: string;
   codigosExame: string[];
   savedAt: number;
+  sala?: string;
+  profissional?: any;
 };
 
 function buildKey(schedulingId: string, codigosExame: string[]): string {
   const sortedCodes = [...codigosExame].sort().join(",");
   return `${DRAFT_KEY_PREFIX}${schedulingId}_${sortedCodes}`;
+}
+
+/**
+ * Retorna todos os rascunhos válidos armazenados no localStorage
+ */
+export function getAllExamDrafts(): { key: string; payload: DraftPayload }[] {
+  if (typeof window === "undefined" || !window.localStorage) return [];
+
+  const results: { key: string; payload: DraftPayload }[] = [];
+  const now = Date.now();
+
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(DRAFT_KEY_PREFIX)) {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          try {
+            const payload: DraftPayload = JSON.parse(raw);
+            if (now - payload.savedAt > DRAFT_EXPIRY_MS) {
+              localStorage.removeItem(key);
+            } else if (payload.schedulingId && Array.isArray(payload.codigosExame)) {
+              results.push({ key, payload });
+            }
+          } catch {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    }
+  } catch {
+    // localStorage desabilitado
+  }
+
+  return results;
+}
+
+/**
+ * Remove um rascunho por sua chave exata
+ */
+export function removeExamDraftByKey(key: string): void {
+  if (typeof window === "undefined" || !window.localStorage) return;
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // ignorar
+  }
 }
 
 /**
@@ -23,6 +72,7 @@ function buildKey(schedulingId: string, codigosExame: string[]): string {
 export function useExamDraft(
   schedulingId: string | null | undefined,
   codigosExame: string[],
+  meta?: { sala?: string; profissional?: any },
 ) {
   const keyRef = useRef<string | null>(null);
 
@@ -48,13 +98,15 @@ export function useExamDraft(
           schedulingId,
           codigosExame,
           savedAt: Date.now(),
+          sala: meta?.sala,
+          profissional: meta?.profissional,
         };
         localStorage.setItem(key, JSON.stringify(payload));
       } catch {
         // localStorage pode estar cheio ou desabilitado — ignorar silenciosamente
       }
     },
-    [schedulingId, codigosExame],
+    [schedulingId, codigosExame, meta?.sala, meta?.profissional],
   );
 
   /**
